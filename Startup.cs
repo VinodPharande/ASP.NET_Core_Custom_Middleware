@@ -1,3 +1,4 @@
+using ASP.NET_Core_Custom_Middleware.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -18,7 +19,11 @@ namespace ASP.NET_Core_Custom_Middleware
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            //Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -64,6 +69,26 @@ namespace ASP.NET_Core_Custom_Middleware
                 //c.DefaultModelExpandDepth(0);
                 //c.DefaultModelsExpandDepth(-1);
             });
+
+            //app.UseCustomMiddleware(new SecurityHeadersBuilder()
+            //  .AddContentTypeOptionsNoSniff()
+            //  .AddCustomHeader("X-My-Custom-Header", "So cool")
+            //  .AddDefaultSecurePolicy()
+            //  .AddFrameOptionsDeny()
+            //  .AddFrameOptionsSameOrigin()
+            //  .AddStrictTransportSecurityMaxAge()
+            //  .AddXssProtectionBlock()
+            //);
+
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+              .AddContentTypeOptionsNoSniff()
+              .AddCustomHeader("X-My-Custom-Header", "So cool")
+              .AddDefaultSecurePolicy()
+              .AddFrameOptionsDeny()
+              .AddFrameOptionsSameOrigin()
+              .AddStrictTransportSecurityMaxAge()
+              .AddXssProtectionBlock()
+            );
 
             app.UseRouting();
 
